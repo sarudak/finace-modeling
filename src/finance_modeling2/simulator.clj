@@ -1,3 +1,0 @@
-(ns finance-modeling.simulator)
-
-
