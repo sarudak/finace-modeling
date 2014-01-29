@@ -23,7 +23,11 @@
 
 (defn get-file-loader [] (LocalTickerFileLoader.))
 
-;(get-data-for-tickers (LocalTickerFileLoader.) ["F" "AAPL" "XOM"])
+(get-data-for-tickers (LocalTickerFileLoader.) ["F" "AAPL" "XOM"])
+
+
+
+
 
 
 

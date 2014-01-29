@@ -7,7 +7,6 @@
 
 (defn first-day-of-month? [date] (= (datetime/day date) 1))
 
-;This function is doing too much
 (defn collate-input [raw-data]
   (let [data (flatten raw-data)
         grouped (group-by :date data)
@@ -21,22 +20,58 @@
 
 (def initial-investment 1000.0)
 
+(defn list-to-map [key-resolver items]
+  (->> items
+       (map #(vector (key-resolver %) %))
+       flatten
+       (apply hash-map)))
+
 (defn format-for-simulation [ticker-data]
   (let [securities (map :ticker (first ticker-data))
         security-count (count securities)
-        to-invest-per-security (/ initial-investment security-count)]
+        to-invest-per-security (/ initial-investment security-count)
+        formatted-ticker-data (map #(list-to-map :ticker %) ticker-data)]
     {:current-investments (zipmap securities (repeat to-invest-per-security))
      :returns '()
-     :ticker-data  ticker-data}))
+     :current-ticker-data (first formatted-ticker-data)
+     :future-ticker-data  (rest formatted-ticker-data)}))
 
-;(defn simulate [simulation-data]
-;  (if (seq :ticker-data )))
+(defn calculate-new-investment-values [past-investments past-ticker-data current-ticker-data]
+  (let [get-adjusted-value #(read-string (:adjusted-value %))]
+    (into {} (for [[ticker investment] past-investments]
+               [ticker (* investment (/ (get-adjusted-value (past-ticker-data ticker)) (get-adjusted-value (current-ticker-data ticker))))]))))
 
-(def sample-data (get-data-for-tickers (get-file-loader) ["F" "AAPL" "XOM"]))
+(defn rebalance [current-investments]
+  (let [tickers (keys current-investments)
+        total-investments (apply + (vals current-investments))]
+    (zipmap tickers (repeat (/ total-investments (count tickers))))))
+
+(defn simulate [{:keys [current-investments returns current-ticker-data future-ticker-data] :as simulation-data}]
+  (if (empty? future-ticker-data)
+    simulation-data
+    (let [future-investments (calculate-new-investment-values current-investments current-ticker-data (first future-ticker-data))
+          rebalanced-investments (rebalance future-investments)
+          return-date (:date (first (vals current-ticker-data)))
+          new-returns (/ (apply + (vals rebalanced-investments)) initial-investment)]
+      (recur {:current-investments rebalanced-investments
+              :final-return new-returns
+              :returns (cons {:date return-date :return new-returns} returns)
+              :current-ticker-data (first future-ticker-data)
+              :future-ticker-data (rest future-ticker-data)}))))
+
+(def sample-data (get-data-for-tickers (get-file-loader) ["AAPL"]))
 
 (def collated-data (collate-input sample-data))
 
 (def formatted-data (format-for-simulation collated-data))
+
+(def apple-only-result (simulate formatted-data))
+
+apple-only-result
+
+rebalance-result
+
+simulation-result
 
 
 
