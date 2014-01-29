@@ -19,18 +19,25 @@
          (sort-by first)
          (map second))))
 
-(def initial-investment 1000)
+(def initial-investment 1000.0)
+
+(defn format-for-simulation [ticker-data]
+  (let [securities (map :ticker (first ticker-data))
+        security-count (count securities)
+        to-invest-per-security (/ initial-investment security-count)]
+    {:current-investments (zipmap securities (repeat to-invest-per-security))
+     :returns '()
+     :ticker-data  ticker-data}))
+
+;(defn simulate [simulation-data]
+;  (if (seq :ticker-data )))
 
 (def sample-data (get-data-for-tickers (get-file-loader) ["F" "AAPL" "XOM"]))
 
-(->> sample-data flatten (group-by :date) (map count-grouping) (apply max))
-
-
 (def collated-data (collate-input sample-data))
 
-(count collated-data)
+(def formatted-data (format-for-simulation collated-data))
 
-collated-data
 
 
 
