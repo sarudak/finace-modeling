@@ -14,5 +14,15 @@
      (->> tickers
           (loader/get-data-for-tickers data-loader)
           simulator/collate-input
+          (simulator/filter-date-by rebalance-trigger)
           simulator/format-for-simulation
           (simulator/simulate rebalance-strategy))))
+
+
+(run-simulation ["F" "AAPL" "XOM"]
+                strategies/no-rebalance
+                strategies/is-monthly-rebalance-day?)
+
+(run-simulation ["F" "AAPL" "XOM"]
+                strategies/flat-rebalance
+                strategies/is-weekly-rebalance-day?)

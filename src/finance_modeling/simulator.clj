@@ -16,13 +16,16 @@
          (sort-by first)
          (map second))))
 
-(def initial-investment 1000.0)
-
 (defn list-to-map [key-resolver items]
   (->> items
        (map #(vector (key-resolver %) %))
        flatten
        (apply hash-map)))
+
+(defn filter-date-by [date-filter data]
+  (filter #(date-filter (:date (first %))) data))
+
+(def initial-investment 1000.0)
 
 (defn format-for-simulation [ticker-data]
   (let [securities (map :ticker (first ticker-data))
@@ -52,6 +55,8 @@
                 :returns (cons {:date return-date :return new-returns} returns)
                 :current-ticker-data (first future-ticker-data)
                 :future-ticker-data (rest future-ticker-data)})))))
+
+
 
 
 
