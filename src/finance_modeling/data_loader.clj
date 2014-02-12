@@ -19,11 +19,10 @@
 
 (defrecord LocalTickerFileLoader [] TickerDataProvider
   (get-data-for-tickers [_ tickers]
-                       (map #(get-ticker-data-from-file %) tickers)))
+                       (map (memoize (fn [ticker] (get-ticker-data-from-file ticker))) tickers)))
 
 (defn get-file-loader [] (LocalTickerFileLoader.))
 
-(get-data-for-tickers (LocalTickerFileLoader.) ["F" "AAPL" "XOM"])
 
 
 

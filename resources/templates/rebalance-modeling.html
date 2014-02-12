@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <script src="js/knockout-3.0.0.js"></script>
+        <script src="js/Chart.min.js"></script>
+        <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+    </head>
+   <body>
+        <form data-bind="submit:addItem">
+            Add item: <input type="text" data-bind='value:tickerToAdd, valueUpdate: "afterkeydown"' />
+            <button type="submit" data-bind="enable: tickerToAdd().length > 0">Add</button>
+        </form>
+        <p>Your values:</p>
+        <select multiple="multiple" height="5" data-bind="options:stockTickers, selectedOptions:selectedTickers"> </select>
+
+        <div>
+            <button data-bind="click: removeSelected, enable: selectedTickers().length > 0">Remove</button>
+            <button data-bind="click: runSimulation, enable: stockTickers().length > 0">Simulate</button>
+        </div>
+
+        <script>
+            var FinancingViewModel = function() {
+                this.stockTickers = ko.observableArray(["F", "AAPL", "EV"]);
+                this.selectedTickers = ko.observableArray(["F"]);
+                this.tickerToAdd = ko.observable("");
+
+                this.addItem = function () {
+                    if ((this.tickerToAdd() != "") && (this.stockTickers.indexOf(this.tickerToAdd()) < 0)) // Prevent blanks and duplicates
+                        this.stockTickers.push(this.tickerToAdd());
+                    this.tickerToAdd(""); // Clear the text box
+                };
+
+                this.removeSelected = function () {
+                    this.stockTickers.removeAll(this.selectedTickers());
+                    this.selectedTickers([]); // Clear selection
+                };
+
+                this.runSimulation = function() {
+                    var data = ko.toJSON(this);
+                    $.post("/simulate", data, function(returnedData) {
+                        alert(returnedData);
+                    })
+                }
+            };
+
+            ko.applyBindings(new FinancingViewModel());
+        </script>
+    </body>
+
+</html>
+
+
+
+

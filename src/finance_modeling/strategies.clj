@@ -1,4 +1,4 @@
-(ns finance-modeling.rebalancing
+(ns finance-modeling.strategies
   (:use clj-time.predicates)
   (:require [clj-time.core :as datetime]))
 
@@ -15,4 +15,6 @@
 
 (defn is-monthly-rebalance-day? [date]
   (or (and (= (datetime/day date) 1) (not (saturday? date)) (not (sunday? date)))
-      (and (#{2 3} (datetime/day date)) (sunday? (datetime/plus date (datetime/days -1))))))
+      (and (#{2 3} (datetime/day date)) (sunday? (datetime/plus date (datetime/days -1))))))
+
+
