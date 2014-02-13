@@ -36,9 +36,9 @@
 
                 this.runSimulation = function() {
                     var data = ko.toJSON(this);
-                    $.post("/simulate", data, function(returnedData) {
+                    $.post("/simulate", {body: data}, function(returnedData) {
                         alert(returnedData);
-                    })
+                    },"json");
                 }
             };
 

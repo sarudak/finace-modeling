@@ -7,7 +7,7 @@
                  [csv-map "0.1.0-SNAPSHOT"]
                  [clj-time "0.6.0"]
                  [compojure "1.1.5"]
-                 [cheshire "4.0.3"]
+                 [cheshire "5.3.1"]
                  [ring/ring-json "0.1.2"]]
   :plugins [[lein-ring "0.8.3"]]
   :ring {:handler finance-modeling.handler/app}

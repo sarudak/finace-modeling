@@ -3,19 +3,31 @@
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.json :as middleware]
-            [finance-modeling.app-service :as service]))
+            [finance-modeling.app-service :as service]
+            [clj-time.format :as datetime]))
 
 ; Here's the template definitions
+(add-encoder org.joda.time.DateTime
+             (fn [date jsonGenerator]
+               (.writeString jsonGenerator
+                 (datetime/unparse (datetime/formatters :basic-date-time) date))))
+
 
 (defn run-simulation [request]
-  (response (service/simulate {:tickers (:stockTickers request)})))
+  (do
+   (println (type request))
+   (println (type (first (keys request))))
+   (println request)
+   (response (service/simulate {:tickers (request "stockTickers")}))))
 
  ; Here's the route definitions
 (defroutes app-routes
   (GET "/" [] (slurp (clojure.java.io/resource "templates/rebalance-modeling.html")))
-  (POST "/simulate" {body :body} (run-simulation body))
+  (POST "/simulate" [body] (run-simulation (parse-string body)))
   (route/resources "/")
   (route/not-found "Not Found"))
+
+
 
 (def app
   (-> (handler/site app-routes)
